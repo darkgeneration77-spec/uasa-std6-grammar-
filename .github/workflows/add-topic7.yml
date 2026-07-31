@@ -1,0 +1,55 @@
+name: Add Topic 7 Comparatives
+on:
+  push:
+    paths:
+      - '.github/workflows/add-topic7.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Insert Topic 7
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          if "startTopic('comparatives')" not in s:
+              card='''\n<div class="topiccard" onclick="startTopic('comparatives')"><span class="badge">Topic 7</span><h3>Comparatives &amp; Superlatives 比较级与最高级</h3><p>Compare two or more people, animals, places and things.</p><b>20 Questions</b></div>'''
+              s=s.replace('\n</div></section>\n<section id="quiz"',card+'\n</div></section>\n<section id="quiz"',1)
+          if "comparatives:{title:'Topic 7" not in s:
+              data='''\n,comparatives:{title:'Topic 7: Comparatives & Superlatives 比较级与最高级',questions:[
+['Ali is _____ than Ahmad.',['tall','taller','tallest','more tall'],1,'Use the comparative taller with than to compare two people. 比较两个人并出现 than，使用 taller。'],
+['Mount Kinabalu is the _____ mountain in Malaysia.',['high','higher','highest','highly'],2,'Use the + highest for the top degree in a group. 在一个范围中表示最高，使用 the highest。'],
+['This bag is _____ than mine.',['heavy','heavier','heaviest','more heavier'],1,'Heavy changes to heavier: change y to i and add -er. heavy 的比较级是 heavier。'],
+['The cheetah is the _____ animal on land.',['fast','faster','fastest','fastly'],2,'The fastest is the superlative form of fast. fastest 表示“最快的”。'],
+['Today is _____ than yesterday.',['hot','hotter','hottest','more hot'],1,'Hot doubles the final consonant: hot → hotter. hot 的比较级双写 t 加 -er。'],
+['English is _____ than Science for me.',['easy','easier','easiest','more easier'],1,'Easy changes to easier: y becomes i before -er. easy 的比较级是 easier。'],
+['The blue whale is the _____ animal in the world.',['large','larger','largest','largely'],2,'Use the largest because it is compared with all animals in the world. 与全世界动物比较，使用最高级 largest。'],
+['My father is _____ than my uncle.',['old','older','oldest','more old'],1,'Use older than to compare two people. 两个人比较使用 older than。'],
+['This question is the _____ one in the test.',['difficult','more difficult','most difficult','difficultest'],2,'Long adjectives use the most for the superlative. difficult 的最高级是 most difficult。'],
+['A rabbit is _____ than a tortoise.',['fast','faster','fastest','fastly'],1,'Faster than compares the speed of two animals. 两种动物比较速度，使用 faster than。'],
+['Lisa is the _____ girl in our class.',['kind','kinder','kindest','more kind'],2,'Use the kindest when comparing Lisa with the whole class. 与全班比较使用最高级 kindest。'],
+['This book is _____ than that one.',['interesting','more interesting','most interesting','interestinger'],1,'Long adjectives use more + adjective for comparisons. interesting 的比较级是 more interesting。'],
+['The Amazon River is one of the _____ rivers in the world.',['long','longer','longest','longly'],2,'After one of the, use a superlative followed by a plural noun. one of the 后使用最高级 longest。'],
+['My brother runs _____ than I do.',['fast','faster','fastest','more fast'],1,'Faster is the comparative adverb used with than. 出现 than，使用 faster。'],
+['Today is the _____ day of the week.',['busy','busier','busiest','more busy'],2,'Busy changes to busiest: y becomes i before -est. busy 的最高级是 busiest。'],
+['A car is _____ than a bicycle.',['expensive','more expensive','most expensive','expensiver'],1,'Long adjectives use more for the comparative. expensive 的比较级是 more expensive。'],
+['This is the _____ movie I have ever watched.',['funny','funnier','funniest','more funny'],2,'The phrase I have ever watched normally takes a superlative. funny 的最高级是 funniest。'],
+['Elephants are _____ than horses.',['strong','stronger','strongest','more strong'],1,'Strong is a short adjective, so add -er: stronger. strong 的比较级是 stronger。'],
+['My sister is the _____ student in her class.',['clever','cleverer','cleverest','more clever'],2,'Use the cleverest when comparing one student with the whole class. 与全班比较使用最高级 cleverest。'],
+['This road is _____ than the old one.',['wide','wider','widest','more wide'],1,'Wide ends in e, so add only -r: wider. wide 的比较级是 wider。']]}
+'''
+              s=s.replace('\n};\nlet topicKey=',data+'\n};\nlet topicKey=',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Add Topic 7 comparatives and superlatives"
+          git push
