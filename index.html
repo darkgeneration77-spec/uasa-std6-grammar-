@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UASA Standard 6 Grammar</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#eef4ff,#fff7e8);color:#1f2937}.wrap{max-width:900px;margin:auto;padding:24px}.hero{background:#fff;border-radius:24px;padding:28px;box-shadow:0 16px 40px rgba(0,0,0,.1);margin-bottom:20px}.hero h1{margin:0 0 8px;font-size:clamp(28px,5vw,48px)}.hero p{margin:0;color:#4b5563;font-size:18px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}.stat{background:#f8fafc;border:1px solid #e5e7eb;border-radius:16px;padding:14px;text-align:center}.stat strong{display:block;font-size:24px}.card{background:#fff;border-radius:22px;padding:24px;box-shadow:0 12px 30px rgba(0,0,0,.08)}.topic{font-weight:700;color:#2563eb;margin-bottom:8px}.question{font-size:24px;font-weight:700;line-height:1.4;margin:10px 0 18px}.options{display:grid;gap:12px}.option{width:100%;text-align:left;padding:15px 16px;border:2px solid #dbeafe;background:#fff;border-radius:14px;font-size:17px;cursor:pointer;transition:.2s}.option:hover{transform:translateY(-1px);border-color:#60a5fa}.option.selected{border-color:#2563eb;background:#eff6ff}.option.correct{border-color:#16a34a;background:#ecfdf5}.option.wrong{border-color:#dc2626;background:#fef2f2}.feedback{margin-top:18px;padding:16px;border-radius:14px;display:none;line-height:1.6}.feedback.show{display:block}.feedback.good{background:#ecfdf5;border:1px solid #86efac}.feedback.bad{background:#fef2f2;border:1px solid #fca5a5}.actions{display:flex;gap:12px;justify-content:space-between;margin-top:20px;flex-wrap:wrap}.btn{border:0;border-radius:14px;padding:13px 20px;font-size:16px;font-weight:700;cursor:pointer}.btn.primary{background:#2563eb;color:#fff}.btn.secondary{background:#e5e7eb;color:#111827}.btn:disabled{opacity:.45;cursor:not-allowed}.progress{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:16px}.progress-bar{height:100%;width:0;background:#2563eb;transition:.3s}.result{display:none;text-align:center}.result.show{display:block}.result h2{font-size:34px;margin-bottom:8px}.mistakes{margin-top:22px;text-align:left}.mistake{padding:14px;border:1px solid #fecaca;background:#fff7f7;border-radius:12px;margin-bottom:10px}.name-box{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}.name-box input{flex:1;min-width:220px;padding:13px 14px;border:2px solid #d1d5db;border-radius:12px;font-size:16px}@media(max-width:600px){.stats{grid-template-columns:1fr}.question{font-size:21px}.wrap{padding:14px}.hero,.card{padding:18px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>UASA Standard 6 Grammar</h1>
+    <p>Topic 1: Nouns — 20 Questions</p>
+    <div class="name-box">
+      <input id="studentName" placeholder="Enter student name">
+      <button class="btn primary" onclick="saveName()">Start</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><span>Question</span><strong id="qStat">1 / 20</strong></div>
+      <div class="stat"><span>Score</span><strong id="scoreStat">0</strong></div>
+      <div class="stat"><span>Student</span><strong id="nameStat">-</strong></div>
+    </div>
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+  </section>
+
+  <section class="card" id="quizCard">
+    <div class="topic">Topic 1: Nouns</div>
+    <div class="question" id="questionText"></div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="actions">
+      <button class="btn secondary" id="checkBtn" onclick="checkAnswer()">Check Answer</button>
+      <button class="btn primary" id="nextBtn" onclick="nextQuestion()" disabled>Next Question</button>
+    </div>
+  </section>
+
+  <section class="card result" id="resultCard">
+    <h2>Practice Completed</h2>
+    <p id="finalText"></p>
+    <button class="btn primary" onclick="restartQuiz()">Try Again</button>
+    <div class="mistakes" id="mistakes"></div>
+  </section>
+</div>
+
+<script>
+const questions = [
+{q:'The _____ are playing football in the field.',o:['boy','boys',"boy's",'boyes'],a:1,e:'“Are” shows that the subject is plural, so “boys” is correct. “Are” 表示主语是复数，因此用 boys。'},
+{q:'My mother bought three _____ from the market.',o:['tomato','tomatos','tomatoes',"tomato's"],a:2,e:'After “three”, use a plural noun. The plural of tomato is tomatoes. three 后面用复数；tomato 的复数是 tomatoes。'},
+{q:'There is a _____ on the table.',o:['books','pencils','book','rulers'],a:2,e:'“There is a” must be followed by a singular noun. “There is a” 后面接单数名词。'},
+{q:'The _____ are flying in the sky.',o:['bird','birds',"bird's",'birding'],a:1,e:'“Are” requires a plural subject, so “birds” is correct. are 后面主语需用复数。'},
+{q:'Ali has two _____.',o:['bicycle','bicycles','bicyles',"bicycle's"],a:1,e:'“Two” must be followed by a plural noun: bicycles. two 后面用复数名词 bicycles。'},
+{q:'My sister has a beautiful _____.',o:['dresses','dress','dresss','dressing'],a:1,e:'The article “a” is followed by a singular noun: dress. a 后面接单数名词 dress。'},
+{q:'The _____ is barking loudly.',o:['dogs','dog','doges',"dog's"],a:1,e:'“Is” requires a singular subject, so “dog” is correct. is 前面的主语应为单数。'},
+{q:'There are many _____ in the library.',o:['book','books','bookes',"book's"],a:1,e:'“Many” is followed by a plural countable noun: books. many 后面接可数名词复数。'},
+{q:'The _____ is full of colourful flowers.',o:['gardens','garden','gardenes','gardener'],a:1,e:'“Is” shows a singular subject, so “garden” is correct. is 表示单数主语。'},
+{q:'My father repaired the _____.',o:['chairs','chair','chaires',"chair's"],a:1,e:'The sentence refers to one chair, so the singular noun “chair” is correct. 句子表示一张椅子，因此用 chair。'},
+{q:'There are five _____ in my pencil case.',o:['eraser','erasers','eraseres','erasing'],a:1,e:'“Five” must be followed by a plural noun: erasers. five 后面用复数 erasers。'},
+{q:'The _____ are swimming in the pond.',o:['fish','fishes','fishs','fishing'],a:0,e:'The common plural form of “fish” is still “fish”. fish 的常见复数仍然是 fish。'},
+{q:'My grandmother grows many _____.',o:['flower','flowers','floweres','flowering'],a:1,e:'“Many” is followed by a plural noun: flowers. many 后面接复数 flowers。'},
+{q:'There is only one _____ in the basket.',o:['oranges','orange','orangees',"orange's"],a:1,e:'“One” is followed by a singular noun: orange. one 后面接单数 orange。'},
+{q:'The _____ are waiting for the bus.',o:['student','students',"student's",'studentes'],a:1,e:'“Are” requires a plural subject: students. are 前面的主语要用复数。'},
+{q:'My uncle has four _____.',o:['sheep','sheeps','sheepes',"sheep's"],a:0,e:'“Sheep” has the same singular and plural form. sheep 的单数和复数形式相同。'},
+{q:'There are many _____ on the beach.',o:['shell','shells','shelles','shelling'],a:1,e:'“Many” needs a plural countable noun: shells. many 后面接可数名词复数 shells。'},
+{q:'The _____ is drinking water.',o:['horses','horse','horsees',"horse's"],a:1,e:'“Is” requires a singular subject: horse. is 前面用单数 horse。'},
+{q:'The _____ are reading quietly.',o:['child','children','childs','childrens'],a:1,e:'“Children” is the irregular plural of “child”. children 是 child 的不规则复数。'},
+{q:'The _____ is shining brightly.',o:['stars','sun','moons','clouds'],a:1,e:'“Is” requires a singular noun, and “the sun” fits the meaning. is 需要单数名词，the sun 符合句意。'}
+];
+let current=0,score=0,selected=null,checked=false,mistakes=[];
+function saveName(){const n=document.getElementById('studentName').value.trim()||'Student';localStorage.setItem('uasaName',n);document.getElementById('nameStat').textContent=n}
+function loadName(){const n=localStorage.getItem('uasaName');if(n){document.getElementById('studentName').value=n;document.getElementById('nameStat').textContent=n}}
+function render(){const item=questions[current];document.getElementById('questionText').textContent=(current+1)+'. '+item.q;const box=document.getElementById('options');box.innerHTML='';item.o.forEach((opt,i)=>{const b=document.createElement('button');b.className='option';b.textContent=String.fromCharCode(65+i)+'. '+opt;b.onclick=()=>selectOption(i,b);box.appendChild(b)});document.getElementById('feedback').className='feedback';document.getElementById('feedback').innerHTML='';document.getElementById('nextBtn').disabled=true;document.getElementById('checkBtn').disabled=false;selected=null;checked=false;updateStats()}
+function selectOption(i,btn){if(checked)return;selected=i;document.querySelectorAll('.option').forEach(x=>x.classList.remove('selected'));btn.classList.add('selected')}
+function checkAnswer(){if(selected===null){alert('Please choose an answer.');return}checked=true;const item=questions[current];const buttons=[...document.querySelectorAll('.option')];buttons[item.a].classList.add('correct');const fb=document.getElementById('feedback');if(selected===item.a){score++;fb.className='feedback show good';fb.innerHTML='<strong>Correct!</strong><br>'+item.e}else{buttons[selected].classList.add('wrong');fb.className='feedback show bad';fb.innerHTML='<strong>Incorrect.</strong><br>Correct answer: <b>'+String.fromCharCode(65+item.a)+'. '+item.o[item.a]+'</b><br>'+item.e;mistakes.push({q:item.q,y:item.o[selected],c:item.o[item.a],e:item.e})}document.getElementById('nextBtn').disabled=false;document.getElementById('checkBtn').disabled=true;updateStats()}
+function nextQuestion(){if(current<questions.length-1){current++;render()}else showResult()}
+function updateStats(){document.getElementById('qStat').textContent=(current+1)+' / '+questions.length;document.getElementById('scoreStat').textContent=score;document.getElementById('progressBar').style.width=((current+(checked?1:0))/questions.length*100)+'%'}
+function showResult(){document.getElementById('quizCard').style.display='none';document.getElementById('resultCard').classList.add('show');document.getElementById('progressBar').style.width='100%';const name=document.getElementById('nameStat').textContent;const percent=Math.round(score/questions.length*100);document.getElementById('finalText').innerHTML='<strong>'+name+'</strong>, your score is <strong>'+score+' / '+questions.length+'</strong> ('+percent+'%).';const m=document.getElementById('mistakes');if(!mistakes.length){m.innerHTML='<h3>No mistakes. Excellent work.</h3>';return}m.innerHTML='<h3>Correction Book 错题订正</h3>'+mistakes.map((x,i)=>'<div class="mistake"><strong>'+(i+1)+'. '+x.q+'</strong><br>Your answer: '+x.y+'<br>Correct answer: <b>'+x.c+'</b><br>'+x.e+'</div>').join('')}
+function restartQuiz(){current=0;score=0;selected=null;checked=false;mistakes=[];document.getElementById('quizCard').style.display='block';document.getElementById('resultCard').classList.remove('show');render()}
+loadName();render();
+</script>
+</body>
+</html>
