@@ -1,0 +1,57 @@
+name: Add Topic 6 Adverbs
+
+on:
+  push:
+    paths:
+      - '.github/workflows/add-topic6.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Insert Topic 6 into index.html
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          card = '''<div class="topiccard" onclick="startTopic('adverbs')"><span class="badge">Topic 6</span><h3>Adverbs 副词</h3><p>Describe how actions are done, including special adverbs.</p><b>20 Questions</b></div>'''
+          if "startTopic('adverbs')" not in s:
+              s = s.replace('</div></section>\n<section id="quiz"', card + '\n</div></section>\n<section id="quiz"', 1)
+          bank = r'''adverbs:{title:'Topic 6: Adverbs 副词',questions:[
+          ['The boy ran _____ to catch the bus.',['quick','quickly','quickest','quickness'],1,'Quickly is an adverb describing how the boy ran. quickly 是副词，说明跑的方式。'],
+          ['Please speak _____ during the examination.',['quiet','quietly','quieter','quietness'],1,'Quietly describes how someone speaks. quietly 修饰动词 speak。'],
+          ['The baby is sleeping _____. Do not make noise.',['peaceful','peacefully','peace','peacely'],1,'Peacefully is an adverb describing sleeping. peacefully 表示“安静地、平和地”。'],
+          ['She answered all the questions _____.',['correct','correctly','correction','correcting'],1,'Correctly modifies the verb answered. correctly 表示“正确地”。'],
+          ['The old man walked _____.',['slow','slowly','slower','slowest'],1,'Slowly tells us how the old man walked. slowly 表示“缓慢地”。'],
+          ['Ali writes _____ than his brother.',['neat','neatly','neater','neatness'],1,'Neatly is the adverb that modifies writes. neatly 修饰动词 writes。'],
+          ['The children laughed _____.',['happy','happily','happiness','happiest'],1,'Happy changes to happily as an adverb. happy 变副词时是 happily。'],
+          ['The teacher explained the lesson _____.',['clear','clearly','clearing','clearest'],1,'Clearly describes how the teacher explained. clearly 表示“清楚地”。'],
+          ['Please drive _____ on rainy days.',['careful','carefully','carefulness','more careful'],1,'Carefully modifies the verb drive. carefully 表示“小心地”。'],
+          ['The dog barked _____ at the stranger.',['loud','loudly','louder','loudness'],1,'Loudly describes how the dog barked. loudly 表示“大声地”。'],
+          ['The students listened _____ to the teacher.',['attentive','attentively','attention','attentiveness'],1,'Attentively modifies listened. attentively 表示“专心地”。'],
+          ['My grandmother smiled _____.',['gentle','gently','gentleness','gentler'],1,'Gently describes how she smiled. gently 表示“温柔地”。'],
+          ['He finished his homework _____.',['fast','fasterly','fastly','fastestly'],0,'Fast can be both an adjective and an adverb. fast 本身可以作副词，不用加 -ly。'],
+          ['The athlete ran very _____.',['fast','fastly','fastestly','fasterly'],0,'Use fast, not fastly. 正确说法是 run fast。'],
+          ['The little girl sang _____.',['beautiful','beautifully','beauty','beautify'],1,'Beautifully modifies the verb sang. beautifully 表示“优美地”。'],
+          ['The workers completed the job _____.',['efficient','efficiently','efficiency','efficientness'],1,'Efficiently describes how the job was completed. efficiently 表示“有效率地”。'],
+          ['He always arrives _____.',['early','earlierly','earlily','earliestly'],0,'Early itself can be an adverb. early 本身可作副词。'],
+          ['The bird flew _____ into the sky.',['high','highly','higherly','highestly'],0,'Fly high means fly at a great height. high 表示“高高地”；highly 通常表示“非常、高度地”。'],
+          ['The students worked _____ before the examination.',['hard','hardly','harderly','hardestly'],0,'Hard means with great effort; hardly means almost not. hard 是“努力地”，hardly 是“几乎不”。'],
+          ['Please wait _____.',['patient','patiently','patience','patientness'],1,'Patiently modifies the verb wait. patiently 表示“耐心地”。']]}
+          '''
+          if "adverbs:{title:'Topic 6" not in s:
+              s = s.replace('\n};\nlet topicKey=', ',\n' + bank + '};\nlet topicKey=', 1)
+          p.write_text(s, encoding='utf-8')
+      - name: Commit Topic 6
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Add Topic 6 Adverbs"
+          git push
