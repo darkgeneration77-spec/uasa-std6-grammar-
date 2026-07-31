@@ -1,0 +1,75 @@
+name: Enhance Grammar Game
+
+on:
+  push:
+    paths:
+      - '.github/workflows/enhance-game.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch index.html
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          css = r'''
+          .leaderboard{margin-top:22px}.leaderboard-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.leaderboard-list{display:grid;gap:9px;margin-top:12px}.leader-row{display:grid;grid-template-columns:54px 1fr 95px 95px;gap:8px;align-items:center;background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:11px}.leader-row.top1{background:#fff8db;border-color:#facc15}.leader-row.top2{background:#f8fafc;border-color:#cbd5e1}.leader-row.top3{background:#fff1e8;border-color:#fdba74}.rank{font-weight:800;text-align:center}.leader-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.leader-score,.leader-topic{text-align:center}.effect-layer{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:9999}.effect-message{position:fixed;left:50%;top:30%;transform:translate(-50%,-50%) scale(.6);padding:16px 24px;border-radius:18px;font-size:clamp(28px,6vw,58px);font-weight:900;z-index:10000;animation:effectPop 1s ease forwards;text-align:center}.effect-message.goodfx{background:#ecfdf5;color:#15803d;border:4px solid #22c55e}.effect-message.badfx{background:#fef2f2;color:#b91c1c;border:4px solid #ef4444}.particle{position:fixed;width:14px;height:14px;border-radius:50%;animation:particleFall 1.15s ease-out forwards}.star-particle{position:fixed;font-size:28px;animation:starBurst 1s ease-out forwards}.screen-flash{position:fixed;inset:0;animation:flashFade .55s ease-out forwards}.shake-screen{animation:screenShake .45s ease}.pulse-screen{animation:screenPulse .55s ease}.sad-drop{position:fixed;font-size:32px;animation:sadDrop 1.1s ease-in forwards}.cross-particle{position:fixed;font-size:30px;font-weight:900;animation:crossBurst .9s ease-out forwards}@keyframes effectPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.5) rotate(-5deg)}45%{opacity:1;transform:translate(-50%,-50%) scale(1.12) rotate(2deg)}100%{opacity:0;transform:translate(-50%,-65%) scale(1)}}@keyframes particleFall{0%{opacity:1;transform:translateY(-20px) rotate(0)}100%{opacity:0;transform:translateY(75vh) rotate(720deg)}}@keyframes starBurst{0%{opacity:1;transform:translate(0,0) scale(.4)}100%{opacity:0;transform:translate(var(--x),var(--y)) scale(1.5) rotate(540deg)}}@keyframes flashFade{0%{opacity:.55}100%{opacity:0}}@keyframes screenShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(12px)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}}@keyframes screenPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.015)}}@keyframes sadDrop{0%{opacity:1;transform:translateY(-50px) rotate(0)}100%{opacity:0;transform:translateY(85vh) rotate(180deg)}}@keyframes crossBurst{0%{opacity:1;transform:translate(0,0) scale(.5)}100%{opacity:0;transform:translate(var(--x),var(--y)) scale(1.3)}}@media(max-width:650px){.leader-row{grid-template-columns:44px 1fr 72px}.leader-topic{display:none}}
+          '''
+          if '.leaderboard{' not in s:
+              s = s.replace('</style>', css + '\n</style>')
+
+          leaderboard = '''
+          <div class="leaderboard">
+            <div class="leaderboard-head"><h2>Leaderboard 排行榜</h2><button class="btn secondary" onclick="clearLeaderboard()">Clear 排行榜清除</button></div>
+            <p>Scores are saved on this device. 成绩保存在目前这台设备。</p>
+            <div id="leaderboardList" class="leaderboard-list"></div>
+          </div>
+          '''
+          if 'id="leaderboardList"' not in s:
+              s = s.replace('</div></section>\n<section id="quiz"', leaderboard + '</div></section>\n<div id="effectLayer" class="effect-layer"></div>\n<section id="quiz"', 1)
+
+          js = r'''
+          const correctMessages=['Excellent! 太棒了！','Perfect! 完美！','Great Job! 做得好！','Brilliant! 真厉害！','Correct! 答对了！'];
+          const wrongMessages=['Try Again! 再试一次！','Almost! 差一点！','Keep Going! 继续努力！','Check the Rule! 看清规则！','Not Yet! 还没答对！'];
+          function effectLayerEl(){return document.getElementById('effectLayer')}
+          function clearEffects(){const l=effectLayerEl();if(l)l.innerHTML='';document.body.classList.remove('shake-screen','pulse-screen')}
+          function showEffectMessage(text,good){const d=document.createElement('div');d.className='effect-message '+(good?'goodfx':'badfx');d.textContent=text;effectLayerEl().appendChild(d);setTimeout(()=>d.remove(),1050)}
+          function confettiEffect(){for(let i=0;i<34;i++){const d=document.createElement('i');d.className='particle';d.style.left=Math.random()*100+'vw';d.style.top=(-10-Math.random()*20)+'px';d.style.background=['#22c55e','#3b82f6','#f59e0b','#a855f7','#ef4444'][i%5];d.style.animationDelay=(Math.random()*.2)+'s';effectLayerEl().appendChild(d);setTimeout(()=>d.remove(),1400)}}
+          function starEffect(){for(let i=0;i<20;i++){const d=document.createElement('span');d.className='star-particle';d.textContent='★';d.style.left='50vw';d.style.top='38vh';d.style.color=['#f59e0b','#22c55e','#3b82f6','#a855f7'][i%4];d.style.setProperty('--x',(Math.random()*520-260)+'px');d.style.setProperty('--y',(Math.random()*360-180)+'px');effectLayerEl().appendChild(d);setTimeout(()=>d.remove(),1100)}}
+          function flashEffect(good){const d=document.createElement('div');d.className='screen-flash';d.style.background=good?'#22c55e':'#ef4444';effectLayerEl().appendChild(d);setTimeout(()=>d.remove(),600)}
+          function rainEffect(symbol){for(let i=0;i<22;i++){const d=document.createElement('span');d.className='sad-drop';d.textContent=symbol;d.style.left=Math.random()*100+'vw';d.style.top=(-70-Math.random()*150)+'px';d.style.animationDelay=(Math.random()*.3)+'s';effectLayerEl().appendChild(d);setTimeout(()=>d.remove(),1500)}}
+          function crossEffect(){for(let i=0;i<18;i++){const d=document.createElement('span');d.className='cross-particle';d.textContent='×';d.style.left='50vw';d.style.top='40vh';d.style.color='#ef4444';d.style.setProperty('--x',(Math.random()*500-250)+'px');d.style.setProperty('--y',(Math.random()*340-170)+'px');effectLayerEl().appendChild(d);setTimeout(()=>d.remove(),1000)}}
+          function playCorrectEffect(){clearEffects();const type=Math.floor(Math.random()*5);showEffectMessage(correctMessages[type],true);if(type===0)confettiEffect();if(type===1)starEffect();if(type===2){flashEffect(true);confettiEffect()}if(type===3){document.body.classList.add('pulse-screen');starEffect()}if(type===4){confettiEffect();starEffect()}setTimeout(()=>document.body.classList.remove('pulse-screen'),650)}
+          function playWrongEffect(){clearEffects();const type=Math.floor(Math.random()*5);showEffectMessage(wrongMessages[type],false);if(type===0){document.body.classList.add('shake-screen');flashEffect(false)}if(type===1)rainEffect('☂');if(type===2)crossEffect();if(type===3){flashEffect(false);rainEffect('!')}if(type===4){document.body.classList.add('shake-screen');crossEffect()}setTimeout(()=>document.body.classList.remove('shake-screen'),550)}
+          function getLeaderboard(){try{return JSON.parse(localStorage.getItem('uasaLeaderboard')||'[]')}catch(e){return []}}
+          function saveLeaderboardEntry(){const name=localStorage.getItem('uasaName')||'Student';const pct=Math.round(score/questions.length*100);const list=getLeaderboard();list.push({name,score,pct,topic:bank[topicKey].title,date:new Date().toLocaleDateString()});list.sort((a,b)=>b.pct-a.pct||b.score-a.score);localStorage.setItem('uasaLeaderboard',JSON.stringify(list.slice(0,20)));renderLeaderboard()}
+          function renderLeaderboard(){const box=document.getElementById('leaderboardList');if(!box)return;const list=getLeaderboard();box.innerHTML=list.length?list.map((x,i)=>'<div class="leader-row '+(i===0?'top1':i===1?'top2':i===2?'top3':'')+'"><div class="rank">#'+(i+1)+'</div><div class="leader-name">'+escapeHtml(x.name)+'</div><div class="leader-score"><b>'+x.score+'/20</b><br>'+x.pct+'%</div><div class="leader-topic">'+escapeHtml((x.topic||'').replace(/^Topic \d+: /,''))+'</div></div>').join(''):'<div class="leader-row"><div class="rank">—</div><div class="leader-name">No scores yet 暂无成绩</div><div class="leader-score">—</div><div class="leader-topic">—</div></div>'}
+          function clearLeaderboard(){if(confirm('Clear all leaderboard scores? 确定清除全部排行榜成绩？')){localStorage.removeItem('uasaLeaderboard');renderLeaderboard()}}
+          function escapeHtml(v){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+          '''
+          if 'function playCorrectEffect()' not in s:
+              s = s.replace("function correctSound(){", js + "\nfunction correctSound(){", 1)
+
+          s = s.replace("score++;correctSound();feedback.className", "score++;correctSound();playCorrectEffect();feedback.className")
+          s = s.replace("}else{wrongSound();bs[selected]", "}else{wrongSound();playWrongEffect();bs[selected]")
+          s = s.replace("function showResult(){quiz.classList.add('hidden');", "function showResult(){saveLeaderboardEntry();quiz.classList.add('hidden');")
+          s = s.replace('loadName();\n</script>', 'loadName();renderLeaderboard();\n</script>')
+
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Add leaderboard and ten answer effects"
+          git push
